@@ -65,5 +65,5 @@ Buka terminal atau command prompt pada direktori tersebut, kemudian jalankan per
 py main.py 
 ```
 
-## Dibuat untuk Tugas Besar Kecerdasan Buatan Semester 4 
-## By : Kelompok 15 
+Dibuat untuk Tugas Besar Kecerdasan Buatan Semester 4 
+By : Kelompok 15 
