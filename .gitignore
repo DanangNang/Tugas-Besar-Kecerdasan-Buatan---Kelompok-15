@@ -1,0 +1,267 @@
+# ============================================================================
+# .gitignore untuk Proyek Decision Tree - Kelompok 15
+# ============================================================================
+
+# ============================================================================
+# Python
+# ============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# Virtual Environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ============================================================================
+# IDEs and Editors
+# ============================================================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Atom
+.atom/
+
+# Eclipse
+.project
+.pydevproject
+.settings/
+
+# ============================================================================
+# Operating Systems
+# ============================================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# Project Specific
+# ============================================================================
+
+# Output files (jika ada)
+output/
+results/
+predictions/
+submissions/
+*.csv.bak
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*_temp.*
+*_backup.*
+
+# Model checkpoints (jika ada model yang disimpan)
+models/
+checkpoints/
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.pt
+*.pth
+
+# Data files (OPTIONAL - uncomment jika tidak ingin commit data)
+# train.csv
+# test.csv
+# *.csv
+
+# Experimental files
+experimental/
+sandbox/
+scratch/
+test_*.py.bak
+*_old.*
+*_deprecated.*
+
+# Documentation build files
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# ============================================================================
+# Backup & Archive
+# ============================================================================
+
+# Backup files
+*.bak
+*.backup
+*~
+*.orig
+
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# ============================================================================
+# Exceptions (files to keep in repo)
+# ============================================================================
+
+# Keep these files even if they match patterns above
+!.gitignore
+!README.md
+!requirements.txt
+
+# Keep main project files
+!main.py
+!test_functions.py
+!train.csv
+!test.csv
+
+# Keep documentation
+!*.md
+!*.txt
+!PENJELASAN_ALGORITMA.md
+!RINGKASAN_IMPLEMENTASI.txt
+!LAPORAN_PENYELESAIAN.txt
+!QUICK_REFERENCE.txt
+
+# ============================================================================
+# End of .gitignore
+# ============================================================================

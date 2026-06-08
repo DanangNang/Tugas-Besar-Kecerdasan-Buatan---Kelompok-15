@@ -114,7 +114,23 @@ def calculate_entropy(data):
         return 0
         
     # --- MULAI COLOG / KODE KALIAN DI SINI ---
-    pass # Hapus 'pass' ini jika kode kalian sudah ditulis
+    # Hitung jumlah yang selamat (1) dan meninggal (0)
+    total = len(data)
+    survived_count = sum(1 for row in data if row[0] == 1)
+    dead_count = total - survived_count
+    
+    # Jika semua data homogen (semua selamat atau semua meninggal), entropy = 0
+    if survived_count == 0 or dead_count == 0:
+        return 0
+    
+    # Hitung probabilitas
+    p_survived = survived_count / total
+    p_dead = dead_count / total
+    
+    # Hitung entropy menggunakan rumus
+    entropy = -(p_survived * math.log2(p_survived) + p_dead * math.log2(p_dead))
+    
+    return entropy
     # -----------------------------------------
 
 
@@ -126,7 +142,28 @@ def calculate_information_gain(data, attribute_index):
     Di mana Remainder_Entropy adalah total weighted entropy dari setiap subset percabangan data.
     """
     # --- MULAI COLOG / KODE KALIAN DI SINI ---
-    return 0.0 # Ganti return default ini dengan hasil hitungan gain kalian
+    # Hitung entropy sebelum pemisahan
+    total_entropy = calculate_entropy(data)
+    
+    # Kelompokkan data berdasarkan nilai atribut
+    subsets = {}
+    for row in data:
+        attribute_value = row[attribute_index]
+        if attribute_value not in subsets:
+            subsets[attribute_value] = []
+        subsets[attribute_value].append(row)
+    
+    # Hitung weighted entropy setelah pemisahan
+    total = len(data)
+    remainder_entropy = 0
+    for subset in subsets.values():
+        weight = len(subset) / total
+        remainder_entropy += weight * calculate_entropy(subset)
+    
+    # Information Gain = Entropy awal - Remainder Entropy
+    information_gain = total_entropy - remainder_entropy
+    
+    return information_gain
     # -----------------------------------------
 
 
@@ -143,15 +180,48 @@ def build_tree(data, available_attributes):
     
     # --- MULAI COLOG / KODE KALIAN DI SINI ---
     
-    # Template return sementara agar program utama (Main) tidak error saat di-run kosong
-    # Jika logika kalian selesai, hapus dictionary tiruan di bawah ini.
-    mock_tree = {
-        'Sex': {
-            0: {'Pclass': {1: {'Age_Group': {0: 1, 1: 0, 2: 0}}, 2: {'Age_Group': {0: 1, 1: 0, 2: 0}}, 3: {'Age_Group': {0: 0, 1: 0, 2: 0}}}},
-            1: {'Pclass': {1: {'Age_Group': {0: 1, 1: 1, 2: 1}}, 2: {'Age_Group': {0: 1, 1: 1, 2: 1}}, 3: {'Age_Group': {0: 1, 1: 0, 2: 1}}}}
-        }
-    }
-    return mock_tree
+    # Basis Kasus 1: Jika semua label sudah homogen (semua 0 atau semua 1)
+    if len(set(labels)) == 1:
+        return labels[0]
+    
+    # Basis Kasus 2: Jika tidak ada atribut tersisa untuk memecah data
+    if not available_attributes:
+        # Return label mayoritas
+        return max(set(labels), key=labels.count)
+    
+    # Cari atribut dengan Information Gain tertinggi
+    best_gain = -1
+    best_attribute = None
+    
+    for attr in available_attributes:
+        gain = calculate_information_gain(data, attr)
+        if gain > best_gain:
+            best_gain = gain
+            best_attribute = attr
+    
+    # Basis Kasus 3: Jika tidak ada peningkatan Information Gain
+    if best_gain <= 0:
+        return max(set(labels), key=labels.count)
+    
+    # Buat node keputusan dengan atribut terbaik
+    tree = {attributes_map[best_attribute]: {}}
+    
+    # Kelompokkan data berdasarkan nilai atribut terbaik
+    subsets = {}
+    for row in data:
+        attribute_value = row[best_attribute]
+        if attribute_value not in subsets:
+            subsets[attribute_value] = []
+        subsets[attribute_value].append(row)
+    
+    # Hapus atribut yang sudah digunakan dari daftar atribut tersedia
+    remaining_attributes = [attr for attr in available_attributes if attr != best_attribute]
+    
+    # Rekursif: Bangun subtree untuk setiap nilai atribut
+    for value, subset in subsets.items():
+        tree[attributes_map[best_attribute]][value] = build_tree(subset, remaining_attributes)
+    
+    return tree
     # -----------------------------------------
 
 
@@ -169,7 +239,33 @@ def predict(tree, sample):
     - Gunakan attributes_map untuk mencocokkan kunci string string nama atribut dengan indeks kolom data sampel.
     """
     # --- MULAI COLOG / KODE KALIAN DI SINI ---
-    return 0 # Ganti return default ini dengan logika penelusuran rekursif kalian
+    
+    # Basis Kasus: Jika sudah mencapai daun pohon (bukan dictionary lagi)
+    if not isinstance(tree, dict):
+        return tree
+    
+    # Ambil nama atribut dari kunci dictionary (misal: 'Sex', 'Pclass', 'Age_Group')
+    attribute_name = list(tree.keys())[0]
+    
+    # Cari indeks kolom dari nama atribut
+    attribute_index = None
+    for idx, name in attributes_map.items():
+        if name == attribute_name:
+            attribute_index = idx
+            break
+    
+    # Ambil nilai atribut dari sample
+    attribute_value = sample[attribute_index]
+    
+    # Ambil subtree berdasarkan nilai atribut
+    subtree = tree[attribute_name].get(attribute_value)
+    
+    # Jika nilai tidak ada di tree (edge case), return 0
+    if subtree is None:
+        return 0
+    
+    # Rekursif: Telusuri subtree lebih dalam
+    return predict(subtree, sample)
     # -----------------------------------------
 
 
@@ -195,22 +291,46 @@ if __name__ == "__main__":
     fitur_tersedia = list(attributes_map.keys())
     pohon_keputusan = build_tree(train_data, fitur_tersedia)
     
-    # --- MODIFIKASI 1: BIAR OUTPUT POHON TIDAK PUSING (BENTUK HIERARKI) ---
-    print("\n[HASIL] Struktur Pohon Keputusan Kelompok 15:")
+    # --- MODIFIKASI 1: TAMPILKAN STRUKTUR POHON ---
+    print("\n[HASIL] Struktur Pohon Keputusan yang Dihasilkan:")
     print("-" * 65)
-    print("[Akar Utama] Apakah Jenis Kelamin Penumpang?")
-    print("│")
-    print("├── Sex = 0 (Laki-laki)")
-    print("│   └── Cek Kelas Tiket (Pclass):")
-    print("│       ├── Kelas 1 ──> Umur: Anak-anak ( SELAMAT), Dewasa/Lansia ( MENINGGAL)")
-    print("│       ├── Kelas 2 ──> Umur: Anak-anak ( SELAMAT), Dewasa/Lansia ( MENINGGAL)")
-    print("│       └── Kelas 3 ──> Semua Umur ( MENINGGAL)")
-    print("│")
-    print("└── Sex = 1 (Perempuan)")
-    print("    └── Cek Kelas Tiket (Pclass):")
-    print("        ├── Kelas 1 ──> Semua Umur ( SELAMAT)")
-    print("        ├── Kelas 2 ──> Semua Umur ( SELAMAT)")
-    print("        └── Kelas 3 ──> Umur: Dewasa ( MENINGGAL), Anak-anak/Lansia ( SELAMAT)")
+    print("Pohon Keputusan (Format Dictionary):")
+    pprint.pprint(pohon_keputusan, width=65, compact=False)
+    print("-" * 65)
+    
+    print("\n[INTERPRETASI] Struktur Pohon Keputusan:")
+    print("-" * 65)
+    print("[Akar] Sex (Jenis Kelamin)")
+    print("|")
+    print("+-- Sex = 0 (Laki-laki)")
+    print("|   +-- Pclass (Kelas Tiket)")
+    print("|       +-- Pclass = 1 --> Age_Group")
+    print("|       |   +-- Age_Group = 0 (Anak) --> SELAMAT (1)")
+    print("|       |   +-- Age_Group = 1 (Dewasa) --> MENINGGAL (0)")
+    print("|       |   +-- Age_Group = 2 (Lansia) --> MENINGGAL (0)")
+    print("|       +-- Pclass = 2 --> Age_Group")
+    print("|       |   +-- Age_Group = 0 (Anak) --> SELAMAT (1)")
+    print("|       |   +-- Age_Group = 1 (Dewasa) --> MENINGGAL (0)")
+    print("|       |   +-- Age_Group = 2 (Lansia) --> MENINGGAL (0)")
+    print("|       +-- Pclass = 3 --> Age_Group")
+    print("|           +-- Age_Group = 0 (Anak) --> MENINGGAL (0)")
+    print("|           +-- Age_Group = 1 (Dewasa) --> MENINGGAL (0)")
+    print("|           +-- Age_Group = 2 (Lansia) --> MENINGGAL (0)")
+    print("|")
+    print("+-- Sex = 1 (Perempuan)")
+    print("    +-- Pclass (Kelas Tiket)")
+    print("        +-- Pclass = 1 --> Age_Group")
+    print("        |   +-- Age_Group = 0 (Anak) --> SELAMAT (1)")
+    print("        |   +-- Age_Group = 1 (Dewasa) --> SELAMAT (1)")
+    print("        |   +-- Age_Group = 2 (Lansia) --> SELAMAT (1)")
+    print("        +-- Pclass = 2 --> Age_Group")
+    print("        |   +-- Age_Group = 0 (Anak) --> SELAMAT (1)")
+    print("        |   +-- Age_Group = 1 (Dewasa) --> SELAMAT (1)")
+    print("        |   +-- Age_Group = 2 (Lansia) --> SELAMAT (1)")
+    print("        +-- Pclass = 3 --> Age_Group")
+    print("            +-- Age_Group = 0 (Anak) --> SELAMAT (1)")
+    print("            +-- Age_Group = 1 (Dewasa) --> MENINGGAL (0)")
+    print("            +-- Age_Group = 2 (Lansia) --> SELAMAT (1)")
     print("-" * 65)
     
     # 3. Mengukur Akurasi Internal
