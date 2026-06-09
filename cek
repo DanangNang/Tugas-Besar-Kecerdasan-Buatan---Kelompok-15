@@ -1,0 +1,34 @@
+[INTERPRETASI] Struktur Pohon Keputusan:
+-----------------------------------------------------------------
+[Akar] Sex (Jenis Kelamin)
+|
++-- Sex = 0 (Laki-laki)
+|   +-- Pclass (Kelas Tiket)
+|       +-- Pclass = 1 --> Age_Group
+|       |   +-- Age_Group = 0 (Anak) --> SELAMAT (1)
+|       |   +-- Age_Group = 1 (Dewasa) --> MENINGGAL (0)
+|       |   +-- Age_Group = 2 (Lansia) --> MENINGGAL (0)
+|       +-- Pclass = 2 --> Age_Group
+|       |   +-- Age_Group = 0 (Anak) --> SELAMAT (1)
+|       |   +-- Age_Group = 1 (Dewasa) --> MENINGGAL (0)
+|       |   +-- Age_Group = 2 (Lansia) --> MENINGGAL (0)
+|       +-- Pclass = 3 --> Age_Group
+|           +-- Age_Group = 0 (Anak) --> MENINGGAL (0)
+|           +-- Age_Group = 1 (Dewasa) --> MENINGGAL (0)
+|           +-- Age_Group = 2 (Lansia) --> MENINGGAL (0)
+|
++-- Sex = 1 (Perempuan)
+    +-- Pclass (Kelas Tiket)
+        +-- Pclass = 1 --> Age_Group
+        |   +-- Age_Group = 0 (Anak) --> SELAMAT (1)
+        |   +-- Age_Group = 1 (Dewasa) --> SELAMAT (1)
+        |   +-- Age_Group = 2 (Lansia) --> SELAMAT (1)
+        +-- Pclass = 2 --> Age_Group
+        |   +-- Age_Group = 0 (Anak) --> SELAMAT (1)
+        |   +-- Age_Group = 1 (Dewasa) --> SELAMAT (1)
+        |   +-- Age_Group = 2 (Lansia) --> SELAMAT (1)
+        +-- Pclass = 3 --> Age_Group
+            +-- Age_Group = 0 (Anak) --> SELAMAT (1)
+            +-- Age_Group = 1 (Dewasa) --> MENINGGAL (0)
+            +-- Age_Group = 2 (Lansia) --> SELAMAT (1)
+-----------------------------------------------------------------

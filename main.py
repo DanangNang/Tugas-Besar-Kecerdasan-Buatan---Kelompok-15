@@ -6,11 +6,6 @@ import pprint
 # =====================================================================
 
 def parse_csv_line(line):
-    """
-    Fungsi ini gunanya untuk memotong baris CSV berdasarkan tanda koma.
-    Hebatnya, fungsi ini bisa tahu kalau ada koma di dalam tanda kutip nama 
-    (seperti "Braund, Mr. Owen"), koma tersebut TIDAK akan memotong data.
-    """
     result = []
     current_word = []
     in_quotes = False
@@ -29,10 +24,6 @@ def parse_csv_line(line):
 
 
 def load_csv(file_path, is_train=True):
-    """
-    Fungsi untuk membaca file 'train.csv' atau 'test.csv'.
-    Di sini data mentah dibersihkan dan diubah jadi angka biasa agar komputer paham.
-    """
     data = []
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -97,23 +88,18 @@ def load_csv(file_path, is_train=True):
 # Kamus penamaan fitur untuk mempermudah cetak pohon keputusan di terminal
 attributes_map = {1: 'Pclass', 2: 'Sex', 3: 'Age_Group'}
 
-
 # =====================================================================
 # 2. LOGIKA MATEMATIKA DECISION TREE (ENTROPY & INFORMATION GAIN)
-# TUGAS KELOMPOK: SILAKAN LENGKAPI LOGIKA DI BAWAH INI (# TODO)
 # =====================================================================
 
 def calculate_entropy(data):
     """
-    # TODO: Tugas Anggota Kelompok
     Menghitung keacakan data (Entropy).
-    Rumus Matematika: Entropy(S) = - p_survived * log2(p_survived) - p_dead * log2(p_dead)
-    Catatan: Target label 'Survived' (0 atau 1) berada di indeks ke-0 pada tiap baris data training.
+    Formula: Entropy(S) = - p_survived * log2(p_survived) - p_dead * log2(p_dead)
     """
     if not data:
         return 0
-        
-    # --- MULAI COLOG / KODE KALIAN DI SINI ---
+    
     # Hitung jumlah yang selamat (1) dan meninggal (0)
     total = len(data)
     survived_count = sum(1 for row in data if row[0] == 1)
@@ -133,15 +119,11 @@ def calculate_entropy(data):
     return entropy
     # -----------------------------------------
 
-
 def calculate_information_gain(data, attribute_index):
     """
-    # TODO: Tugas Anggota Kelompok
-    Menghitung Information Gain untuk mengetahui bobot terbaik suatu kolom/atribut.
-    Rumus Matematika: Gain(S, A) = Entropy(Sebelum Dipisah) - Remainder_Entropy(Setelah Dipisah)
-    Di mana Remainder_Entropy adalah total weighted entropy dari setiap subset percabangan data.
+    Menghitung Information Gain sebuah atribut.
+    Formula: Gain(S, A) = Entropy(S) - Remainder_Entropy
     """
-    # --- MULAI COLOG / KODE KALIAN DI SINI ---
     # Hitung entropy sebelum pemisahan
     total_entropy = calculate_entropy(data)
     
@@ -166,19 +148,11 @@ def calculate_information_gain(data, attribute_index):
     return information_gain
     # -----------------------------------------
 
-
 def build_tree(data, available_attributes):
     """
-    # TODO: Tugas Anggota Kelompok
-    Membangun struktur Decision Tree (Nested Dictionary) secara rekursif.
-    Petunjuk Basis Kasus (Stopping Conditions):
-    1. Jika semua target label sudah homogen (selamat semua atau meninggal semua).
-    2. Jika available_attributes sudah kosong (tidak ada fitur sisa untuk memecah data).
-    3. Jika tidak ada peningkatan Information Gain yang berarti (Gain <= 0).
+    Membangun arsitektur Decision Tree ID3 secara rekursif.
     """
     labels = [row[0] for row in data]
-    
-    # --- MULAI COLOG / KODE KALIAN DI SINI ---
     
     # Basis Kasus 1: Jika semua label sudah homogen (semua 0 atau semua 1)
     if len(set(labels)) == 1:
@@ -224,22 +198,14 @@ def build_tree(data, available_attributes):
     return tree
     # -----------------------------------------
 
-
 # =====================================================================
 # 3. FUNGSI UNTUK MENEBAK / PREDIKSI DATA BARU
-# TUGAS KELOMPOK: SILAKAN LENGKAPI LOGIKA DI BAWAH INI (# TODO)
 # =====================================================================
 
 def predict(tree, sample):
     """
-    # TODO: Tugas Anggota Kelompok
-    Menelusuri struktur pohon keputusan (nested dictionary) secara rekursif untuk menebak hasil akhir (0 atau 1).
-    Petunjuk: 
-    - Jika objek 'tree' bukan lagi berbentuk dictionary (isinstance(tree, dict) bernilai False), artinya perayapan sudah menyentuh ujung daun keputusan. Langsung kembalikan nilainya.
-    - Gunakan attributes_map untuk mencocokkan kunci string string nama atribut dengan indeks kolom data sampel.
+    Menelusuri struktur pohon keputusan secara rekursif untuk klasifikasi akhir.
     """
-    # --- MULAI COLOG / KODE KALIAN DI SINI ---
-    
     # Basis Kasus: Jika sudah mencapai daun pohon (bukan dictionary lagi)
     if not isinstance(tree, dict):
         return tree
@@ -268,7 +234,6 @@ def predict(tree, sample):
     return predict(subtree, sample)
     # -----------------------------------------
 
-
 # =====================================================================
 # 4. JALUR UTAMA (APLIKASI UTAMA SAAT DI-RUN) 
 # =====================================================================
@@ -292,11 +257,11 @@ if __name__ == "__main__":
     pohon_keputusan = build_tree(train_data, fitur_tersedia)
     
     # --- MODIFIKASI 1: TAMPILKAN STRUKTUR POHON ---
-    print("\n[HASIL] Struktur Pohon Keputusan yang Dihasilkan:")
-    print("-" * 65)
-    print("Pohon Keputusan (Format Dictionary):")
-    pprint.pprint(pohon_keputusan, width=65, compact=False)
-    print("-" * 65)
+    # print("\n[HASIL] Struktur Pohon Keputusan yang Dihasilkan:")
+    # print("-" * 65)
+    # print("Pohon Keputusan (Format Dictionary):")
+    # pprint.pprint(pohon_keputusan, width=65, compact=False)
+    # print("-" * 65)
     
     print("\n[INTERPRETASI] Struktur Pohon Keputusan:")
     print("-" * 65)
@@ -342,7 +307,7 @@ if __name__ == "__main__":
             total_benar += 1
             
     skor_akurasi = (total_benar / len(train_data)) * 100
-    print(f" -> Tingkat Akurasi Model Kelompok Kita: {skor_akurasi:.2f}%")
+    print(f" -> Tingkat Akurasi Model : {skor_akurasi:.2f}%")
     
     # --- MODIFIKASI 2: BIAR OUTPUT TABEL PREDIKSI LEBIH RAPI & BERSIH ---
     print("\n[4/4] Menebak keselamatan penumpang di data 'test.csv'...")
