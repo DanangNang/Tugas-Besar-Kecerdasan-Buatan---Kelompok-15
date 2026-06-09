@@ -1,5 +1,6 @@
 import math
 import pprint
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 
 # =====================================================================
 # 1. BAGIAN MEMBACA FILE CSV (PEMBACA DATA MANUAL)
@@ -235,7 +236,82 @@ def predict(tree, sample):
     # -----------------------------------------
 
 # =====================================================================
-# 4. JALUR UTAMA (APLIKASI UTAMA SAAT DI-RUN) 
+# 4. FUNGSI EVALUASI MODEL (METRIK PERFORMA)
+# =====================================================================
+
+def print_evaluation_report(actual_labels, predicted_labels):
+    """
+    Mencetak laporan evaluasi yang lengkap menggunakan sklearn metrics.
+    
+    Menampilkan:
+    - Confusion Matrix dalam format tabel
+    - Semua metrik evaluasi (Accuracy, Precision, Recall, F1 Score)
+    - Interpretasi otomatis berdasarkan threshold
+    
+    Args:
+        actual_labels: List label aktual (0 atau 1)
+        predicted_labels: List label prediksi (0 atau 1)
+    """
+    # Hitung confusion matrix menggunakan sklearn
+    cm = confusion_matrix(actual_labels, predicted_labels)
+    TN, FP, FN, TP = cm[0][0], cm[0][1], cm[1][0], cm[1][1]
+    
+    # Hitung metrik menggunakan sklearn
+    accuracy = accuracy_score(actual_labels, predicted_labels)
+    precision = precision_score(actual_labels, predicted_labels, zero_division=0)
+    recall = recall_score(actual_labels, predicted_labels, zero_division=0)
+    f1 = f1_score(actual_labels, predicted_labels, zero_division=0)
+    
+    print("\n" + "=" * 65)
+    print("           LAPORAN EVALUASI MODEL (TRAINING DATA)")
+    print("=" * 65)
+    
+    # Confusion Matrix
+    print("\n[A] CONFUSION MATRIX")
+    print("-" * 65)
+    print(f"                    Prediksi: Meninggal | Prediksi: Selamat")
+    print(f"Aktual: Meninggal   TN = {TN:<16} | FP = {FP:<16}")
+    print(f"Aktual: Selamat     FN = {FN:<16} | TP = {TP:<16}")
+    print("-" * 65)
+    
+    # Metrik Detail
+    print("\n[B] METRIK EVALUASI")
+    print("-" * 65)
+    print(f"1. Accuracy  : {accuracy*100:.2f}%")
+    print(f"   -> {TP + TN} prediksi benar dari {TP + TN + FP + FN} total data")
+    print()
+    print(f"2. Precision : {precision*100:.2f}%")
+    print(f"   -> Dari {TP + FP} prediksi 'Selamat', {TP} benar-benar selamat")
+    print()
+    print(f"3. Recall    : {recall*100:.2f}%")
+    print(f"   -> Dari {TP + FN} yang selamat, {TP} berhasil diprediksi")
+    print()
+    print(f"4. F1 Score  : {f1*100:.2f}%")
+    print(f"   -> Harmonic mean dari Precision dan Recall")
+    print("-" * 65)
+    
+    # Interpretasi
+    print("\n[C] INTERPRETASI")
+    print("-" * 65)
+    if recall > 0.8:
+        print("+ Recall tinggi: Model baik mendeteksi orang yang selamat")
+    else:
+        print("! Recall rendah: Model banyak melewatkan orang yang selamat")
+    
+    if precision > 0.8:
+        print("+ Precision tinggi: Prediksi 'Selamat' sangat akurat")
+    else:
+        print("! Precision rendah: Banyak false alarm untuk prediksi 'Selamat'")
+    
+    if f1 > 0.75:
+        print("+ F1 Score baik: Model seimbang antara Precision dan Recall")
+    else:
+        print("! F1 Score rendah: Perlu perbaikan model")
+    print("=" * 65)
+    # -----------------------------------------
+
+# =====================================================================
+# 5. JALUR UTAMA (APLIKASI UTAMA SAAT DI-RUN) 
 # =====================================================================
 
 if __name__ == "__main__":
@@ -298,16 +374,19 @@ if __name__ == "__main__":
     print("            +-- Age_Group = 2 (Lansia) --> SELAMAT (1)")
     print("-" * 65)
     
-    # 3. Mengukur Akurasi Internal
-    print("\n[3/4] Mengukur tingkat akurasi model...")
-    total_benar = 0
+    # 3. Evaluasi Model dengan Metrik Lengkap
+    print("\n[3/4] Mengevaluasi performa model...")
+    
+    # Kumpulkan semua prediksi dan label aktual
+    actual_labels = []
+    predicted_labels = []
+    
     for row in train_data:
-        tebakan = predict(pohon_keputusan, row)
-        if tebakan == row[0]:
-            total_benar += 1
-            
-    skor_akurasi = (total_benar / len(train_data)) * 100
-    print(f" -> Tingkat Akurasi Model : {skor_akurasi:.2f}%")
+        actual_labels.append(row[0])
+        predicted_labels.append(predict(pohon_keputusan, row))
+    
+    # Tampilkan laporan evaluasi lengkap menggunakan sklearn
+    print_evaluation_report(actual_labels, predicted_labels)
     
     # --- MODIFIKASI 2: BIAR OUTPUT TABEL PREDIKSI LEBIH RAPI & BERSIH ---
     print("\n[4/4] Menebak keselamatan penumpang di data 'test.csv'...")
